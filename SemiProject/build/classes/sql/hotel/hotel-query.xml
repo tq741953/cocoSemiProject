@@ -1,0 +1,1501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="getSearchListCount">
+		SELECT
+				COUNT(*)
+		  FROM
+		  		HOTEL
+		  WHERE HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 OR HOTEL_ADDRESS LIKE '%' || ? ||'%'
+	</entry>
+	<entry key="selectSearchList">
+	  SELECT 
+				RNUM
+			  , HOTEL_ID
+              , HOTEL_NAME
+              , HOTEL_ADDRESS
+              , HOTEL_PHONE
+              , HOTEL_X
+              , HOTEL_Y
+              , FILE_RENAME
+              , FILE_URL
+              , STATUS
+              , ROOM_NO
+              , ROOM_COUNT
+              , ROOM_PRICE
+              , ADULT_COUNT
+              , CHILD_COUNT
+              , HOTEL_SERVICE
+              , BED_TYPE
+              , ROOM_TYPE
+		FROM (SELECT 
+						ROWNUM RNUM
+					  , A.*
+   				   FROM 
+						(SELECT 
+								HOTEL_ID
+                               , HOTEL_NAME
+					           , HOTEL_ADDRESS
+					           , HOTEL_PHONE
+					           , HOTEL_X
+					           , HOTEL_Y
+					           , FILE_RENAME
+					           , FILE_URL
+					           , STATUS
+					           , ROOM_NO
+					           , ROOM_COUNT
+					           , ROOM_PRICE
+					           , ADULT_COUNT
+					           , CHILD_COUNT
+					           , HOTEL_SERVICE
+					           , BED_TYPE
+					           , ROOM_TYPE
+                		   FROM 
+                		   		HOTEL H
+				                JOIN HOTEL_FILE USING(HOTEL_ID)
+				                JOIN ROOM USING(HOTEL_ID)
+                		  WHERE 
+                		  		HOTEL_NAME LIKE '%' || ? ||'%' OR HOTEL_ADDRESS LIKE '%' || ? ||'%'
+                		    
+			           ) 
+			           	A)
+			WHERE 
+				  RNUM BETWEEN ? AND ?
+			  AND STATUS = 'Y'
+			  AND ADULT_COUNT >= ?
+              AND CHILD_COUNT >= ?
+              AND (HOTEL_ID,ROOM_PRICE) IN (SELECT HOTEL_ID, MIN(ROOM_PRICE)
+		                                    FROM HOTEL 
+		                                    JOIN ROOM USING (HOTEL_ID)
+		                                    WHERE ADULT_COUNT >= ?
+		                                    AND CHILD_COUNT >= ?                                    
+		                                    GROUP BY HOTEL_ID)
+		                                    
+	</entry>
+	<entry key="selectHotel">
+		SELECT
+				HOTEL_ID
+              , HOTEL_NAME
+              , HOTEL_ADDRESS
+              , HOTEL_PHONE
+              , HOTEL_X
+              , HOTEL_Y
+              , FILE_RENAME
+              , FILE_URL
+              , STATUS
+              , ROOM_NO
+              , ROOM_COUNT
+              , ROOM_PRICE
+              , ADULT_COUNT
+              , CHILD_COUNT
+              , HOTEL_SERVICE
+              , BED_TYPE
+              , ROOM_TYPE
+		   FROM 
+        		HOTEL H
+                JOIN HOTEL_FILE USING(HOTEL_ID)
+                JOIN ROOM USING(HOTEL_ID)
+          WHERE
+          		ROOM_NO = ?
+          	AND STATUS = 'Y'
+	</entry>
+	<entry key="hotelPayment">
+		SELECT
+				HOTEL_ID
+              , HOTEL_NAME
+              , HOTEL_ADDRESS
+              , HOTEL_PHONE
+              , HOTEL_X
+              , HOTEL_Y
+              , FILE_RENAME
+              , FILE_URL
+              , STATUS
+              , ROOM_NO
+              , ROOM_COUNT
+              , ROOM_PRICE
+              , ADULT_COUNT
+              , CHILD_COUNT
+              , HOTEL_SERVICE
+              , BED_TYPE
+              , ROOM_TYPE
+         FROM
+         		HOTEL
+         		JOIN ROOM USING(HOTEL_ID)
+         		JOIN HOTEL_FILE H USING(HOTEL_ID)
+        WHERE
+        		ROOM_NO = ?	
+	</entry>
+	<entry key="checkRoom">
+		SELECT COUNT(*)
+		  FROM ROOM
+			   JOIN RESERVATION USING(ROOM_NO)
+		 WHERE (CHECK_IN BETWEEN TO_DATE(?,'YY-MM-DD') AND TO_DATE(?, 'YY-MM-DD')
+			OR CHECK_OUT BETWEEN TO_DATE(?,'YY-MM-DD') AND TO_DATE(?, 'YY-MM-DD'))
+		   AND CHECK_OUT ^= TO_DATE(?,'YY-MM-DD')
+		   AND ROOM_NO = ?
+	</entry>
+	<entry key="insertReservation">
+		INSERT
+		INTO RESERVATION
+		(
+			 RESERVATION_NO
+		   , ACCOUNT_ID
+		   , ROOM_NO
+		   , CHECK_IN
+		   , CHECK_OUT
+		   , REQUEST
+		   , PAY_TYPE
+		   , PAY_PRICE
+		   , PAY_CODE
+		   , PAY_STATUS
+		   , STATUS
+		   , ADULT_COUNT
+		   , CHILD_COUNT
+		   , GUEST_NAME
+		   , GUEST_PHONE
+		   , ROOM_COUNT
+		)
+		VALUES
+		(
+			RSV_SEQ.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , 'Y'
+		  , 'Y'
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		)
+	</entry>
+	<entry key="sortPayment">
+SELECT 
+               RNUM
+              , HOTEL_ID
+                 , HOTEL_NAME
+                 , HOTEL_ADDRESS
+                 , HOTEL_PHONE
+                 , HOTEL_X
+                 , HOTEL_Y
+                 , FILE_RENAME
+                 , FILE_URL
+                 , STATUS
+                 , ROOM_NO
+                 , ROOM_COUNT
+                 , ROOM_PRICE
+                 , ADULT_COUNT
+                 , CHILD_COUNT
+                 , HOTEL_SERVICE
+                 , BED_TYPE
+                 , ROOM_TYPE
+         FROM (SELECT 
+                     ROWNUM RNUM
+                    , A.*
+                     FROM 
+                     (SELECT 
+                           HOTEL_ID
+                                  , HOTEL_NAME
+                             , HOTEL_ADDRESS
+                             , HOTEL_PHONE
+                             , HOTEL_X
+                             , HOTEL_Y
+                             , FILE_RENAME
+                             , FILE_URL
+                             , STATUS
+                             , ROOM_NO
+                             , ROOM_COUNT
+                             , ROOM_PRICE
+                             , ADULT_COUNT
+                             , CHILD_COUNT
+                             , HOTEL_SERVICE
+                             , BED_TYPE
+                             , ROOM_TYPE
+                            FROM 
+                                  HOTEL H
+                               JOIN HOTEL_FILE USING(HOTEL_ID)
+                               JOIN ROOM USING(HOTEL_ID)
+                           WHERE 
+                                 HOTEL_NAME LIKE '%' || ? ||'%' OR HOTEL_ADDRESS LIKE '%' || ? ||'%'
+                                 ORDER BY ? 
+                       ) 
+                          A)
+            WHERE 
+                 RNUM BETWEEN ? AND ?
+              AND STATUS = 'Y'
+              AND ADULT_COUNT >= ?
+                 AND CHILD_COUNT >= ?
+                 AND (HOTEL_ID,ROOM_PRICE) IN (SELECT HOTEL_ID, MIN(ROOM_PRICE)
+                                             FROM HOTEL 
+                                             JOIN ROOM USING (HOTEL_ID)
+                                             WHERE ADULT_COUNT >= ?
+                                             AND CHILD_COUNT >= ?                                    
+                                             GROUP BY HOTEL_ID)
+	</entry>
+	<entry key="selectReview">
+		SELECT 
+        		REVIEW_NO
+      		  , R.ACCOUNT_ID
+      		  , R.RESERVATION_NO
+      		  , REVIEW_TITLE
+      		  , REVIEW_CONTENT
+      		  , REVIEW_GRADE
+      		  , CREATE_DATE
+      		  , MODIFY_DATE
+      		  , R.STATUS
+      		  , RCOUNT
+      		  , NAME
+		   FROM REVIEW R
+				JOIN RESERVATION S ON(R.RESERVATION_NO = S.RESERVATION_NO)
+				JOIN ROOM O ON(S.ROOM_NO = O.ROOM_NO)
+				JOIN ACCOUNT A ON(R.ACCOUNT_ID = A.ACCOUNT_ID)
+		  WHERE HOTEL_ID = ?
+		  	AND STATUS = 'Y'
+		  ORDER BY CREATE_DATE DESC
+	</entry>
+	<entry key="getAvgGrade">
+		SELECT 
+      		   AVG(NVL(R.REVIEW_GRADE,0))
+   		  FROM REVIEW R
+		  JOIN RESERVATION S ON(R.RESERVATION_NO = S.RESERVATION_NO)
+		  JOIN ROOM O ON(S.ROOM_NO = O.ROOM_NO)
+		  JOIN ACCOUNT A ON(R.ACCOUNT_ID = A.ACCOUNT_ID)
+  		  WHERE HOTEL_ID = ?
+	</entry>
+	<entry key="selectRoomFile">
+		SELECT FILE_ID, ROOM_NO, FILE_NAME, FILE_RENAME, FILE_URL
+		  FROM ROOM_FILE
+		  JOIN ROOM USING(ROOM_NO)
+		  JOIN HOTEL USING(HOTEL_ID)
+		 WHERE HOTEL_ID = ?
+	</entry>
+	<entry key="sortPaymentLow">
+		SELECT 
+				RNUM
+			  , HOTEL_ID
+              , HOTEL_NAME
+              , HOTEL_ADDRESS
+              , HOTEL_PHONE
+              , HOTEL_X
+              , HOTEL_Y
+              , FILE_RENAME
+              , FILE_URL
+              , STATUS
+              , ROOM_NO
+              , ROOM_COUNT
+              , ROOM_PRICE
+              , ADULT_COUNT
+              , CHILD_COUNT
+              , HOTEL_SERVICE
+              , BED_TYPE
+              , ROOM_TYPE
+		FROM (SELECT 
+						ROWNUM RNUM
+					  , A.*
+   				   FROM 
+						(SELECT 
+								HOTEL_ID
+                               , HOTEL_NAME
+					           , HOTEL_ADDRESS
+					           , HOTEL_PHONE
+					           , HOTEL_X
+					           , HOTEL_Y
+					           , FILE_RENAME
+					           , FILE_URL
+					           , STATUS
+					           , ROOM_NO
+					           , ROOM_COUNT
+					           , ROOM_PRICE
+					           , ADULT_COUNT
+					           , CHILD_COUNT
+					           , HOTEL_SERVICE
+					           , BED_TYPE
+					           , ROOM_TYPE
+                		   FROM 
+                		   		HOTEL H
+				                JOIN HOTEL_FILE USING(HOTEL_ID)
+				                JOIN ROOM USING(HOTEL_ID)
+                		  WHERE 
+                		  		HOTEL_NAME LIKE '%' || ? ||'%' OR HOTEL_ADDRESS LIKE '%' || ? ||'%'
+                	   ORDER BY ROOM_PRICE DESC
+			           ) 
+			           	A)
+			WHERE 
+				  RNUM BETWEEN ? AND ?
+			  AND STATUS = 'Y'
+			  AND ADULT_COUNT >= ?
+              AND CHILD_COUNT >= ?
+              AND (HOTEL_ID,ROOM_PRICE) IN (SELECT HOTEL_ID, MIN(ROOM_PRICE)
+		                                    FROM HOTEL 
+		                                    JOIN ROOM USING (HOTEL_ID)
+		                                    WHERE ADULT_COUNT >= ?
+		                                    AND CHILD_COUNT >= ?                                    
+		                                    GROUP BY HOTEL_ID)
+		     ORDER BY ROOM_PRICE ASC
+	</entry>
+	<entry key="reviewDetail">
+		 SELECT
+                RNUM
+              , REVIEW_NO
+      		  , ACCOUNT_ID
+      		  , RESERVATION_NO
+      		  , REVIEW_TITLE
+      		  , REVIEW_CONTENT
+      		  , REVIEW_GRADE
+      		  , CREATE_DATE
+      		  , MODIFY_DATE
+      		  , STATUS
+      		  , RCOUNT
+      		  , NAME
+              , HOTEL_NAME      
+    	   FROM (SELECT ROWNUM RNUM ,A.*
+           		   FROM (SELECT 
+				        		REVIEW_NO
+				      		  , R.ACCOUNT_ID
+				      		  , R.RESERVATION_NO
+				      		  , REVIEW_TITLE
+				      		  , REVIEW_CONTENT
+				      		  , REVIEW_GRADE
+				      		  , CREATE_DATE
+				      		  , MODIFY_DATE
+				      		  , R.STATUS
+				      		  , RCOUNT
+				      		  , NAME
+				              , HOTEL_NAME
+		   				   FROM REVIEW R
+						   JOIN RESERVATION S ON(R.RESERVATION_NO = S.RESERVATION_NO)
+						   JOIN ROOM O ON(S.ROOM_NO = O.ROOM_NO)
+						   JOIN ACCOUNT A ON(R.ACCOUNT_ID = A.ACCOUNT_ID)
+		                   JOIN HOTEL H USING(HOTEL_ID)
+		  				  WHERE HOTEL_ID = ?
+            				AND R.STATUS = 'Y'
+		  						ORDER BY CREATE_DATE DESC	)A)
+         		   WHERE 
+				  		 RNUM BETWEEN ? AND ?	
+	</entry>
+	<entry key="getReviewListCount">
+		SELECT 
+        		COUNT(*)
+		  FROM REVIEW R
+		  JOIN RESERVATION S ON(R.RESERVATION_NO = S.RESERVATION_NO)
+		  JOIN ROOM O ON(S.ROOM_NO = O.ROOM_NO)
+		  JOIN ACCOUNT A ON(R.ACCOUNT_ID = A.ACCOUNT_ID)
+          JOIN HOTEL H USING(HOTEL_ID)
+		 WHERE HOTEL_ID = ?
+           AND R.STATUS = 'Y'
+	</entry>
+	<entry key="getPaymentRangeListCount">
+		SELECT
+				COUNT(*)
+		  FROM
+		  		HOTEL
+                JOIN ROOM USING(HOTEL_ID)
+		  WHERE (HOTEL_NAME LIKE '%' || ? || '%' 
+		 	 OR HOTEL_ADDRESS LIKE '%' || ? || '%')
+             AND ROOM_PRICE BETWEEN ? AND ?
+	</entry>
+	<entry key="getOverPaymentRangeListCount">
+		SELECT
+				COUNT(*)
+		  FROM
+		  		HOTEL
+                JOIN ROOM USING(HOTEL_ID)
+		  WHERE (HOTEL_NAME LIKE '%' || ? || '%' 
+		 	 OR HOTEL_ADDRESS LIKE '%' || ? || '%')
+             AND ROOM_PRICE >= ?
+	</entry>
+	<entry key="sortPriceRange">
+		SELECT 
+               RNUM
+              , HOTEL_ID
+                 , HOTEL_NAME
+                 , HOTEL_ADDRESS
+                 , HOTEL_PHONE
+                 , HOTEL_X
+                 , HOTEL_Y
+                 , FILE_RENAME
+                 , FILE_URL
+                 , STATUS
+                 , ROOM_NO
+                 , ROOM_COUNT
+                 , ROOM_PRICE
+                 , ADULT_COUNT
+                 , CHILD_COUNT
+                 , HOTEL_SERVICE
+                 , BED_TYPE
+                 , ROOM_TYPE
+         FROM (SELECT 
+                     ROWNUM RNUM
+                    , A.*
+                     FROM 
+                     (SELECT 
+                           HOTEL_ID
+                                  , HOTEL_NAME
+                             , HOTEL_ADDRESS
+                             , HOTEL_PHONE
+                             , HOTEL_X
+                             , HOTEL_Y
+                             , FILE_RENAME
+                             , FILE_URL
+                             , STATUS
+                             , ROOM_NO
+                             , ROOM_COUNT
+                             , ROOM_PRICE
+                             , ADULT_COUNT
+                             , CHILD_COUNT
+                             , HOTEL_SERVICE
+                             , BED_TYPE
+                             , ROOM_TYPE
+                            FROM 
+                                  HOTEL H
+                               JOIN HOTEL_FILE USING(HOTEL_ID)
+                               JOIN ROOM USING(HOTEL_ID)
+                           WHERE 
+                                 HOTEL_NAME LIKE '%' || ? || '%' OR HOTEL_ADDRESS LIKE '%' || ? || '%'
+                             AND ROOM_PRICE BETWEEN ? AND ?
+                         ORDER BY ROOM_PRICE ASC
+                       ) 
+                          A)
+            WHERE 
+                 RNUM BETWEEN ? AND ?
+              AND STATUS = 'Y'
+              AND ADULT_COUNT >= ?
+                 AND CHILD_COUNT >= ?
+                 AND ROOM_PRICE BETWEEN ? AND ?
+                 AND (HOTEL_ID,ROOM_PRICE) IN (SELECT HOTEL_ID, MIN(ROOM_PRICE)
+                                             FROM HOTEL 
+                                             JOIN ROOM USING (HOTEL_ID)
+                                             WHERE ADULT_COUNT >= ?
+                                             AND CHILD_COUNT >= ?                                    
+                                             GROUP BY HOTEL_ID)
+	</entry>
+	<entry key="getfilterListCount1">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND HOTEL_SERVICE LIKE '%' || ? ||'%'
+	</entry>
+	<entry key="getfilterListCount2">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND (HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%'))
+	</entry>
+	<entry key="getfilterListCount3">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND (HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%'))
+	</entry>
+	<entry key="getfilterListCount4">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND (HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%'))
+	</entry>
+	<entry key="getfilterListCount5">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND (HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%'))
+	</entry>
+	<entry key="getfilterListCount6">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND (HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%'))
+	</entry>
+	<entry key="getfilterListCount7">
+	SELECT count(*)             
+ 	  FROM (SELECT
+					*
+		  	  FROM
+		  			HOTEL
+                	JOIN ROOM USING(HOTEL_ID)
+		  			WHERE (HOTEL_NAME LIKE '%' || ? ||'%' 
+		 	 		   OR HOTEL_ADDRESS LIKE '%' || ? ||'%')
+             		  AND (HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%' AND HOTEL_SERVICE LIKE '%' || ? ||'%'))
+	</entry>
+	<entry key="FilterList1">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+	<entry key="FilterList2">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+	<entry key="FilterList3">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+	<entry key="FilterList4">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+	<entry key="FilterList5">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+	<entry key="FilterList6">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+	<entry key="FilterList7">
+	SELECT 
+					RNUM
+				  , HOTEL_ID
+	              , HOTEL_NAME
+	              , HOTEL_ADDRESS
+	              , HOTEL_PHONE
+	              , HOTEL_X
+	              , HOTEL_Y
+	              , FILE_RENAME
+	              , FILE_URL
+	              , STATUS
+	              , ROOM_NO
+	              , ROOM_COUNT
+	              , ROOM_PRICE
+	              , ADULT_COUNT
+	              , CHILD_COUNT
+	              , HOTEL_SERVICE
+	              , BED_TYPE
+	              , ROOM_TYPE
+			FROM (SELECT 
+							ROWNUM RNUM
+						  , A.*
+	   				   FROM 
+							(SELECT 
+									HOTEL_ID
+	                               , HOTEL_NAME
+						           , HOTEL_ADDRESS
+						           , HOTEL_PHONE
+						           , HOTEL_X
+						           , HOTEL_Y
+						           , FILE_RENAME
+						           , FILE_URL
+						           , STATUS
+						           , ROOM_NO
+						           , ROOM_COUNT
+						           , ROOM_PRICE
+						           , ADULT_COUNT
+						           , CHILD_COUNT
+						           , HOTEL_SERVICE
+						           , BED_TYPE
+						           , ROOM_TYPE
+	                		   FROM 
+	                		   		HOTEL H
+					                JOIN HOTEL_FILE USING(HOTEL_ID)
+					                JOIN ROOM USING(HOTEL_ID)
+	                		  WHERE 
+	                		  		HOTEL_NAME LIKE '%'|| ? || '%' OR HOTEL_ADDRESS LIKE '%'|| ? || '%'
+				           ) 
+				           	A)
+				WHERE 
+					  RNUM BETWEEN ? AND ?
+				  AND STATUS = 'Y'
+				  AND ADULT_COUNT >= ?
+	              AND CHILD_COUNT >= ?
+                  AND (HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%' AND HOTEL_SERVICE LIKE '%'|| ? || '%')
+	</entry>
+
+		<entry key="selectList">
+		SELECT
+	          B.*
+	        , A.NAME
+		 FROM
+         	  ACCOUNT A ,
+              (SELECT    Q.QNA_NO
+                        ,Q.ACCOUNT_ID
+                        ,Q.HOTEL_ID
+                        ,Q.QNA_TITLE
+                        ,Q.QNA_CONTENT
+                        ,Q.QNA_ANSWER
+                        ,Q.CREATE_DATE
+                        ,Q.STATUS
+                        ,Q.QNACOUNT
+                        ,Q.QNA_STATUS
+                        ,Q.MODIFY_DATE
+                        , H.HOTEL_NAME
+              FROM  HOTEL H, QNA Q
+              WHERE Q.HOTEL_ID = H.HOTEL_ID
+              ) B
+		WHERE
+			  B.STATUS = 'Y'
+		  AND  A.ACCOUNT_ID = B.ACCOUNT_ID
+		  AND HOTEL_ID = ?
+	 ORDER BY
+	 		  QNA_NO DESC
+	</entry>
+	<entry key="selectQnA">
+		SELECT
+	          B.*
+	        , A.NAME
+		 FROM
+         	  ACCOUNT A ,
+              (SELECT    Q.QNA_NO
+                        ,Q.ACCOUNT_ID
+                        ,Q.HOTEL_ID
+                        ,Q.QNA_TITLE
+                        ,Q.QNA_CONTENT
+                        ,Q.QNA_ANSWER
+                        ,Q.CREATE_DATE
+                        ,Q.STATUS
+                        ,Q.QNACOUNT
+                        ,Q.QNA_STATUS
+                        ,Q.MODIFY_DATE
+                        , H.HOTEL_NAME
+              FROM  HOTEL H, QNA Q
+              WHERE Q.HOTEL_ID = H.HOTEL_ID
+              ) B
+		WHERE
+			  B.STATUS = 'Y'
+		  AND  A.ACCOUNT_ID = B.ACCOUNT_ID
+		  AND  QNA_NO = ?
+	</entry>
+	<entry key="increaseCount">
+		UPDATE
+		       QNA
+		   SET
+		       QNACOUNT = QNACOUNT + 1
+		 WHERE
+		       QNA_NO = ?
+		   AND STATUS = 'Y'
+	</entry>
+	<entry key="selectApprovalList">
+			SELECT
+               	  RNUM
+				, HOTEL_ID
+				, ACCOUNT_ID
+				, HOTEL_NAME
+				, HOTEL_ADDRESS
+				, HOTEL_PHONE
+				, STATUS
+				, BUSINESS_LICENSE
+				, HOTEL_STATUS
+                , FILE_RENAME
+                , FILE_URL
+    		 FROM
+				  (SELECT
+                   		  ROWNUM RNUM
+                		, C.*
+    				 FROM
+        				  (SELECT
+								  A.HOTEL_ID
+								, A.ACCOUNT_ID
+								, A.HOTEL_NAME
+								, A.HOTEL_ADDRESS
+								, A.HOTEL_PHONE
+								, A.STATUS
+								, A.BUSINESS_LICENSE
+								, A.HOTEL_STATUS
+                                , B.FILE_RENAME
+                                , B.FILE_URL
+		  					 FROM 
+		       					  HOTEL A
+                                  LEFT JOIN BUSINESS_PHOTO B ON(A.HOTEL_ID = B.HOTEL_ID)
+		 					WHERE
+				                 HOTEL_STATUS = 'Y'
+                        AND STATUS = 'N'
+	  					 ORDER BY
+	           					 A.HOTEL_ID DESC)
+               		C)
+    	WHERE
+              RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="approvalHotel">
+		UPDATE
+			  HOTEL
+		   SET
+		   	  STATUS = 'Y'
+		 WHERE
+		 	  HOTEL_ID = ?
+		   AND
+		   	  STATUS = 'N'
+	</entry>
+			<entry key="insertQnA">
+		INSERT
+         	  INTO QNA 
+         	  (
+ 			   QNA_NO
+			 , ACCOUNT_ID
+			 , HOTEL_ID
+			 , QNA_TITLE
+			 , QNA_CONTENT
+			 , CREATE_DATE
+			 , STATUS
+			 , QNACOUNT
+			 , QNA_STATUS
+			 , MODIFY_DATE
+       		 )
+       		 VALUES
+       		(
+      	 	 QNA_SEQ.NEXTVAL
+       		, ?
+       		, ?
+       		, ?
+       		, ?
+       		, SYSDATE
+       		, DEFAULT
+       		, DEFAULT
+       		, DEFAULT
+       		, SYSDATE
+       		)
+	</entry>
+	<entry key="getHotelListByAccountId">
+			SELECT
+               	  RNUM
+				, HOTEL_ID
+				, ACCOUNT_ID
+				, HOTEL_NAME
+				, HOTEL_ADDRESS
+				, HOTEL_PHONE
+				, STATUS
+				, BUSINESS_LICENSE
+				, HOTEL_STATUS
+    		 FROM
+				  (SELECT
+                   		  ROWNUM RNUM
+                		, C.*
+    				 FROM
+        				  (SELECT
+								  A.HOTEL_ID
+								, A.ACCOUNT_ID
+								, A.HOTEL_NAME
+								, A.HOTEL_ADDRESS
+								, A.HOTEL_PHONE
+								, A.STATUS
+								, A.BUSINESS_LICENSE
+								, A.HOTEL_STATUS
+		  					 FROM 
+		       					  HOTEL A
+		 					WHERE
+				                 ACCOUNT_ID = ?
+	  					 ORDER BY
+	           					 A.HOTEL_ID DESC)
+               		C)
+    	WHERE
+              RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="getHotelListCountByAccountId">
+	SELECT
+		  COUNT(*)
+      FROM
+		   (SELECT
+                   ROWNUM RNUM
+                 , C.*
+    		  FROM
+        	 	  (SELECT
+						 A.HOTEL_ID
+					   , A.ACCOUNT_ID
+					   , A.HOTEL_NAME
+					   , A.HOTEL_ADDRESS
+					   , A.HOTEL_PHONE
+					   , A.STATUS
+					   , A.BUSINESS_LICENSE
+					   , A.HOTEL_STATUS
+		 			 FROM 
+		       			  HOTEL A
+		 			 WHERE
+		      			   A.STATUS = 'Y'
+               		   AND ACCOUNT_ID = ?
+	  		ORDER BY
+	           		 A.HOTEL_ID DESC)
+            C)
+	</entry>
+	<entry key="getSearchHotelNameListCount">
+	     SELECT 
+    		   COUNT(*)
+		  FROM 
+    		   HOTEL
+		 WHERE
+    	       STATUS = 'Y'
+		   AND HOTEL_NAME LIKE '%'||?||'%'
+           AND ACCOUNT_ID = ?
+	</entry>
+	<entry key="getSearchAddresstListCount">
+		 SELECT 
+    		   COUNT(*)
+		  FROM 
+    		   HOTEL 
+		 WHERE
+    	       STATUS = 'Y'
+		   AND HOTEL_ADDRESS LIKE '%'||?||'%'
+           AND ACCOUNT_ID = ?
+	</entry>
+	<entry key="selectSearchHotelNameList">
+		SELECT
+               RNUM
+ 			 , HOTEL_ID
+			 , ACCOUNT_ID
+			 , HOTEL_NAME
+			 , HOTEL_ADDRESS
+			 , HOTEL_PHONE
+			 , STATUS
+			 , BUSINESS_LICENSE
+			 , HOTEL_STATUS
+    	 FROM
+			 (SELECT
+                    ROWNUM RNUM
+                  , C.*
+    			FROM
+        		   (SELECT
+						  A.HOTEL_ID
+						 , A.ACCOUNT_ID
+						 , A.HOTEL_NAME
+						 , A.HOTEL_ADDRESS
+						 , A.HOTEL_PHONE
+						 , A.STATUS
+						 , A.BUSINESS_LICENSE
+						 , A.HOTEL_STATUS
+		  			  FROM 
+		      			   HOTEL A
+		 			  WHERE
+		       			   A.STATUS = 'Y'
+		   			   AND A.HOTEL_NAME LIKE '%'||?||'%'
+			           AND ACCOUNT_ID = ?
+	  			  ORDER BY
+	           			  A.HOTEL_ID DESC)
+             C)
+    	WHERE
+              RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="selectSearchAddressList">
+			SELECT
+               	  RNUM
+				, HOTEL_ID
+				, ACCOUNT_ID
+				, HOTEL_NAME
+				, HOTEL_ADDRESS
+				, HOTEL_PHONE
+				, STATUS
+				, BUSINESS_LICENSE
+				, HOTEL_STATUS
+   			  FROM
+				  (SELECT
+                   		 ROWNUM RNUM
+                	   , C.*
+    				 FROM
+        				 (SELECT
+								A.HOTEL_ID
+							  , A.ACCOUNT_ID
+							  , A.HOTEL_NAME
+							  , A.HOTEL_ADDRESS
+							  , A.HOTEL_PHONE
+							  , A.STATUS
+							  , A.BUSINESS_LICENSE
+							  , A.HOTEL_STATUS
+		  				  FROM 
+		      				   HOTEL A
+		 				  WHERE
+		       				   A.STATUS = 'Y'
+		   				    AND A.HOTEL_ADDRESS LIKE '%'||?||'%'
+               				AND ACCOUNT_ID = ?
+	  				   ORDER BY
+	           				   A.HOTEL_ID DESC)
+               		C)
+    		  WHERE
+              	   RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="getHotelQnAListCountByHotelId">
+		SELECT
+			  COUNT(*)
+    	  FROM
+			  (SELECT
+                   	 ROWNUM RNUM
+                   , C.*
+    		   FROM
+        		   (SELECT
+						  Q.QNA_NO
+						, Q.ACCOUNT_ID
+						, Q.HOTEL_ID
+						, Q.QNA_TITLE
+						, Q.QNA_CONTENT
+						, Q.QNA_ANSWER
+						, Q.CREATE_DATE
+						, Q.STATUS
+						, Q.QNACOUNT
+						, Q.QNA_STATUS
+						, Q.MODIFY_DATE
+		  			 FROM 
+		       			  QNA Q
+		 			WHERE
+		       			  Q.STATUS = 'Y'
+               		  AND HOTEL_ID = ?
+	  			 ORDER BY
+	           		     Q.HOTEL_ID DESC)
+               C)
+	</entry>
+	<entry key="getHotelQnAListByHotelId">
+		SELECT
+              RNUM
+			, QNA_NO
+			, ACCOUNT_ID
+			, HOTEL_ID
+			, QNA_TITLE
+			, QNA_CONTENT
+			, QNA_ANSWER
+			, CREATE_DATE
+			, STATUS
+			, QNACOUNT
+			, QNA_STATUS
+			, MODIFY_DATE
+			, HOTEL_NAME
+			, NAME
+    	FROM
+			(SELECT
+                   ROWNUM RNUM
+                 , C.*
+    		   FROM
+        		   (SELECT
+						  A.QNA_NO
+						, A.ACCOUNT_ID
+						, A.HOTEL_ID
+						, A.QNA_TITLE
+						, A.QNA_CONTENT
+						, A.QNA_ANSWER
+						, A.CREATE_DATE
+						, A.STATUS
+						, A.QNACOUNT
+						, A.QNA_STATUS
+						, A.MODIFY_DATE
+						, H.HOTEL_NAME
+						, S.NAME
+		  			 FROM 
+		       			  QNA A
+		       			, HOTEL H
+		       			, ACCOUNT S
+		 			WHERE
+		       			  A.STATUS = 'Y'
+               		  AND A.HOTEL_ID = H.HOTEL_ID
+               		  AND A.ACCOUNT_ID = S.ACCOUNT_ID
+               	 	  AND A.HOTEL_ID = ?
+	  			 ORDER BY
+	           			 A.QNA_NO DESC)
+             C)
+    	WHERE
+             RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="insertQnAAnswer">
+	UPDATE 
+		  QNA
+	   SET 
+	   	  QNA_ANSWER = ?
+	   	, QNA_STATUS = 2
+	 WHERE
+	 	  QNA_NO = ?
+	</entry>
+	<entry key="getSearchHotelQnATitleListCount">
+			 SELECT 
+    		   COUNT(*)
+		  FROM 
+    		   QNA 
+		 WHERE
+    	       STATUS = 'Y'
+		   AND QNA_TITLE LIKE '%'||?||'%'
+           AND HOTEL_ID = ?
+	</entry>
+	<entry key="getSearchHotelQnAContentListCount">
+			 SELECT 
+    		   COUNT(*)
+		  FROM 
+    		   QNA 
+		 WHERE
+    	       STATUS = 'Y'
+		   AND QNA_CONTENT LIKE '%'||?||'%'
+           AND HOTEL_ID = ?
+	</entry>
+	<entry key="selectSearchQnAtitleList">
+		SELECT
+              RNUM
+			, QNA_NO
+			, ACCOUNT_ID
+			, HOTEL_ID
+			, QNA_TITLE
+			, QNA_CONTENT
+			, QNA_ANSWER
+			, CREATE_DATE
+			, STATUS
+			, QNACOUNT
+			, QNA_STATUS
+			, MODIFY_DATE
+			, HOTEL_NAME
+			, NAME
+    	FROM
+			(SELECT
+                   ROWNUM RNUM
+                 , C.*
+    		   FROM
+        		   (SELECT
+						  A.QNA_NO
+						, A.ACCOUNT_ID
+						, A.HOTEL_ID
+						, A.QNA_TITLE
+						, A.QNA_CONTENT
+						, A.QNA_ANSWER
+						, A.CREATE_DATE
+						, A.STATUS
+						, A.QNACOUNT
+						, A.QNA_STATUS
+						, A.MODIFY_DATE
+						, H.HOTEL_NAME
+						, S.NAME
+		  			 FROM 
+		       			  QNA A
+		       			, HOTEL H
+		       			, ACCOUNT S
+		 			WHERE
+		       			  A.STATUS = 'Y'
+               		  AND A.HOTEL_ID = H.HOTEL_ID
+               		  AND A.ACCOUNT_ID = S.ACCOUNT_ID
+               	 	  AND A.HOTEL_ID = ?
+                      AND QNA_TITLE LIKE '%'||?||'%'
+	  			 ORDER BY
+	           			 A.QNA_NO DESC)
+             C)
+    	WHERE
+             RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="selectSearchQnAContentList">
+		SELECT
+              RNUM
+			, QNA_NO
+			, ACCOUNT_ID
+			, HOTEL_ID
+			, QNA_TITLE
+			, QNA_CONTENT
+			, QNA_ANSWER
+			, CREATE_DATE
+			, STATUS
+			, QNACOUNT
+			, QNA_STATUS
+			, MODIFY_DATE
+			, HOTEL_NAME
+			, NAME
+    	FROM
+			(SELECT
+                   ROWNUM RNUM
+                 , C.*
+    		   FROM
+        		   (SELECT
+						  A.QNA_NO
+						, A.ACCOUNT_ID
+						, A.HOTEL_ID
+						, A.QNA_TITLE
+						, A.QNA_CONTENT
+						, A.QNA_ANSWER
+						, A.CREATE_DATE
+						, A.STATUS
+						, A.QNACOUNT
+						, A.QNA_STATUS
+						, A.MODIFY_DATE
+						, H.HOTEL_NAME
+						, S.NAME
+		  			 FROM 
+		       			  QNA A
+		       			, HOTEL H
+		       			, ACCOUNT S
+		 			WHERE
+		       			  A.STATUS = 'Y'
+               		  AND A.HOTEL_ID = H.HOTEL_ID
+               		  AND A.ACCOUNT_ID = S.ACCOUNT_ID
+               	 	  AND A.HOTEL_ID = ?
+                      AND QNA_CONTENT LIKE '%'||?||'%'
+	  			 ORDER BY
+	           			 A.QNA_NO DESC)
+             C)
+    	WHERE
+             RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="getHotelListByHotelId">
+		SELECT 
+			   HOTEL_ID
+			 , ACCOUNT_ID
+			 , HOTEL_NAME
+			 , HOTEL_ADDRESS
+			 , HOTEL_PHONE
+	 		 , HOTEL_X
+			 , HOTEL_Y
+			 , STATUS
+			 , BUSINESS_LICENSE
+			 , HOTEL_STATUS
+		 FROM 
+		 	  HOTEL
+		WHERE 
+			  HOTEL_ID = ?
+	</entry>
+	<entry key="getListCount">
+		SELECT
+		       COUNT(*)
+		  FROM 
+		       	HOTEL
+		 WHERE
+		       STATUS = 'N'
+	</entry>
+	<entry key="selectPhoto">
+		SELECT 
+				FILE_ID
+			  , HOTEL_ID
+			  , FILE_NAME
+			  , FILE_RENAME
+			  , FILE_URL
+          FROM 
+          		BUSINESS_PHOTO
+         WHERE
+         	    HOTEL_ID = ?
+	</entry>
+</properties>

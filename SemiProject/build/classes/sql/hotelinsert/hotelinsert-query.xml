@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="HotelboardList">
+		SELECT
+				HOTEL_ID
+			  , ACCOUNT_ID
+			  , HOTEL_NAME
+			  , HOTEL_ADDRESS
+			  , HOTEL_PHONE
+			  , STATUS
+			  , BUSINESS_LICENSE
+			  , HOTEL_STATUS
+		FROM
+				HOTEL
+				
+		WHERE
+				STATUS = 'Y'
+                AND ACCOUNT_ID = ?
+	</entry>
+
+	<entry key="HotelfileboardList">
+		SELECT
+				FILE_ID
+			  , HOTEL_ID
+			  , FILE_NAME
+			  , FILE_RENAME
+			  , FILE_URL
+		FROM
+				HOTEL_FILE
+	</entry>
+	
+	<entry key="hotelBoardInsert">
+		INSERT
+		INTO HOTEL
+		(
+				HOTEL_ID
+			  , ACCOUNT_ID
+			  , HOTEL_NAME
+			  , HOTEL_ADDRESS
+			  , HOTEL_PHONE
+			  , STATUS
+			  , BUSINESS_LICENSE
+			  , HOTEL_STATUS
+		)
+		VALUES
+		(
+				HOTEL_SEQ.NEXTVAL
+			  , ?
+			  , ?
+			  , ?
+			  , ?
+			  , DEFAULT
+			  , ?
+			  , DEFAULT
+		)
+	</entry>
+	
+	<entry key="hotel_fileBoardInsert">
+		INSERT
+		INTO HOTEL_FILE
+		(
+			  FILE_ID
+			, HOTEL_ID
+			, FILE_NAME
+			, FILE_RENAME
+			, FILE_URL
+		)
+		VALUES
+		(
+			  HFILE_SEQ.NEXTVAL
+			, HOTEL_SEQ.CURRVAL
+			, ?
+			, ?
+			, ?
+		)
+	</entry>
+	
+	<entry key="hotlecheckboard">
+		SELECT
+				HOTEL_ID
+			  , ACCOUNT_ID
+			  , HOTEL_NAME
+			  , HOTEL_ADDRESS
+			  , HOTEL_PHONE
+			  , STATUS
+			  , BUSINESS_LICENSE
+			  , HOTEL_STATUS
+		FROM
+				HOTEL
+		WHERE
+				HOTEL_ID = ?
+	</entry>
+	
+	<entry key="hotel_filecheckboard">
+		SELECT 
+				FILE_ID
+			  , HOTEL_ID
+			  , FILE_NAME
+			  , FILE_RENAME
+			  , FILE_URL
+		FROM
+				HOTEL_FILE
+		WHERE
+				HOTEL_ID = ?
+	</entry>
+	<entry key="hotel_blpInsert">
+		INSERT
+		INTO BUSINESS_PHOTO
+		(
+			  FILE_ID
+			, HOTEL_ID
+			, FILE_NAME
+			, FILE_RENAME
+			, FILE_URL
+		)
+		VALUES
+		(
+			  BLP_SEQ.NEXTVAL
+			, HOTEL_SEQ.CURRVAL
+			, ?
+			, ?
+			, ?
+		)
+	</entry>
+</properties>

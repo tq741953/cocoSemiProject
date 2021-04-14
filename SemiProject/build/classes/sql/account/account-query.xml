@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="loginMember">
+		SELECT
+				ACCOUNT_ID
+			  , PASSWORD
+			  , NAME
+			  , EMAIL
+			  , PHONE
+			  , AUTH
+			  , STATUS
+			  , BUSINESS_LICENSE
+			  , EMAIL_AUTH
+		FROM
+				ACCOUNT
+		WHERE
+				ACCOUNT_ID = ?
+			AND PASSWORD = ?
+			AND STATUS = 'Y'
+	</entry>
+	<entry key="insertMember1">
+		INSERT
+		INTO ACCOUNT
+		(
+				ACCOUNT_ID
+			  , PASSWORD
+			  , NAME
+			  , EMAIL
+			  , PHONE
+			  , AUTH
+			  , STATUS
+			  , BUSINESS_LICENSE
+			  , EMAIL_AUTH
+		
+		)
+		VALUES
+		(
+			  ?
+			, ?
+			, ?
+			, ?
+			, ?
+			, 1
+			, DEFAULT
+			, null
+			, DEFAULT
+		)
+	</entry>
+		<entry key="insertMember2">
+		INSERT
+		INTO ACCOUNT
+		(
+				ACCOUNT_ID
+			  , PASSWORD
+			  , NAME
+			  , EMAIL
+			  , PHONE
+			  , AUTH
+			  , STATUS
+			  , BUSINESS_LICENSE
+			  , EMAIL_AUTH
+		
+		)
+		VALUES
+		(
+			  ?
+			, ?
+			, ?
+			, ?
+			, ?
+			, 2
+			, 'Y'
+			, ?
+			, DEFAULT
+		)
+	</entry>
+		<entry key="insertMember2nd">
+		INSERT
+		INTO BUSINESS_LICENSE_PHOTO
+		(
+				FILE_ID
+              , ACCOUNT_ID
+              , FILE_NAME
+              , FILE_RENAME
+              , FILE_URL
+		)
+		VALUES
+		(
+			  BFILE_SEQ.NEXTVAL
+			, ?
+			, ?
+			, ?
+			, ?
+		)
+	</entry>
+	<entry key="deleteMember">
+		UPDATE 
+			ACCOUNT
+		SET 
+			STATUS = 'N'
+		WHERE 
+			ACCOUNT_ID = ?
+	</entry>
+	<entry key="updateMember">
+		UPDATE
+			ACCOUNT
+		SET
+			NAME = ?
+		  , EMAIL = ?
+		  , PHONE = ?
+		WHERE
+			ACCOUNT_ID = ?
+	</entry>
+	<entry key="selectMember">
+		SELECT
+			ACCOUNT_ID
+		  , PASSWORD
+		  , NAME
+		  , EMAIL
+		  , PHONE
+		  , AUTH
+		  , STATUS
+		  , BUSINESS_LICENSE
+		  , EMAIL_AUTH
+		FROM
+			ACCOUNT
+		WHERE
+			ACCOUNT_ID = ?
+		AND STATUS = 'Y'
+		AND EMAIL_AUTH = 1
+	</entry>
+	<entry key="updatePwd">
+		UPDATE
+			ACCOUNT
+		SET
+			PASSWORD = ?
+		WHERE
+			ACCOUNT_ID = ?
+		AND PASSWORD = ?
+	</entry>
+	<entry key="tempPwd">
+		UPDATE
+			ACCOUNT
+		SET
+			PASSWORD = ?
+		WHERE
+			ACCOUNT_ID = ?
+	</entry>
+	<entry key="findId">
+		SELECT
+			RPAD(SUBSTR(ACCOUNT_ID,1,3),LENGTH(ACCOUNT_ID),'*') ACCOUNT_ID
+		  , NAME
+		  , EMAIL
+		FROM
+			ACCOUNT
+		WHERE
+			NAME = ?
+		AND EMAIL = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="idCheck">
+		SELECT
+			COUNT(*)
+		FROM
+			ACCOUNT
+		WHERE
+			ACCOUNT_ID = ?
+	</entry>
+	<entry key="findPwd">
+		SELECT
+			ACCOUNT_ID
+		  , PASSWORD
+		  , NAME
+		  , EMAIL
+		  , PHONE
+		  , AUTH
+		  , STATUS
+		  , BUSINESS_LICENSE
+		  , EMAIL_AUTH
+		FROM
+			ACCOUNT
+		WHERE
+			ACCOUNT_ID = ?
+		AND	NAME = ?
+		AND EMAIL = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="selectBusinessLicensePhoto">
+		SELECT
+			FILE_ID
+		  , ACCOUNT_ID
+		  , FILE_NAME
+		  , FILE_RENAME
+		  , FILE_URL
+		FROM
+			BUSINESS_LICENSE_PHOTO
+		WHERE
+			ACCOUNT_ID = ?
+	</entry>
+	<entry key="updateEmail">
+		UPDATE
+			  ACCOUNT
+		  SET 
+		  	  EMAIL_AUTH = 1
+		 WHERE
+		 	   ACCOUNT_ID = ?
+		   AND EMAIL = ? 
+	</entry>
+	<entry key="selectQnAList">
+		SELECT 
+               Q.QNA_NO
+             , Q.ACCOUNT_ID
+             , Q.HOTEL_ID
+             , Q.QNA_TITLE
+             , Q.QNA_CONTENT
+             , Q.QNA_ANSWER
+             , Q.CREATE_DATE
+             , Q.STATUS
+             , Q.QNACOUNT
+             , Q.QNA_STATUS
+             , Q.MODIFY_DATE 
+             , A.NAME
+			 , H.HOTEL_NAME
+         FROM 
+              QNA Q, ACCOUNT A, HOTEL H
+        WHERE 
+              Q.ACCOUNT_ID = ?
+          AND Q.ACCOUNT_ID = A.ACCOUNT_ID
+          AND H.HOTEL_ID = Q.HOTEL_ID
+          AND Q.STATUS = 'Y'
+     ORDER BY
+     		 Q.QNA_NO DESC
+	</entry>
+		<entry key="increaseCount">
+		UPDATE
+		       QNA
+		   SET
+		       QNACOUNT = QNACOUNT + 1
+		 WHERE
+		       QNA_NO = ?
+		   AND STATUS = 'Y'
+	</entry>
+	<entry key="selectQnA">
+		SELECT
+	          B.*
+	        , A.NAME
+		 FROM
+         	  ACCOUNT A ,
+              (SELECT    Q.QNA_NO
+                        ,Q.ACCOUNT_ID
+                        ,Q.HOTEL_ID
+                        ,Q.QNA_TITLE
+                        ,Q.QNA_CONTENT
+                        ,Q.QNA_ANSWER
+                        ,Q.CREATE_DATE
+                        ,Q.STATUS
+                        ,Q.QNACOUNT
+                        ,Q.QNA_STATUS
+                        ,Q.MODIFY_DATE
+                        , H.HOTEL_NAME
+              FROM  HOTEL H, QNA Q
+              WHERE Q.HOTEL_ID = H.HOTEL_ID
+              ) B
+		WHERE
+			  B.STATUS = 'Y'
+		  AND  A.ACCOUNT_ID = B.ACCOUNT_ID
+		  AND  QNA_NO = ?
+	</entry>
+		<entry key="insertQnA">
+		INSERT
+         	  INTO QNA 
+         	  (
+ 			   QNA_NO
+			 , ACCOUNT_ID
+			 , HOTEL_ID
+			 , QNA_TITLE
+			 , QNA_CONTENT
+			 , CREATE_DATE
+			 , STATUS
+			 , QNACOUNT
+			 , QNA_STATUS
+			 , MODIFY_DATE
+       		 )
+       		 VALUES
+       		(
+      	 	 QNA_SEQ.NEXTVAL
+       		, ?
+       		, ?
+       		, ?
+       		, ?
+       		, SYSDATE
+       		, DEFAULT
+       		, DEFAULT
+       		, DEFAULT
+       		, SYSDATE
+       		)
+	</entry>
+	<entry key="updateQnA">
+		UPDATE 
+			   QNA
+		   SET 
+		      QNA_TITLE = ?
+		   	, QNA_CONTENT = ?
+		 WHERE 
+		 	  QNA_NO = ?
+	</entry>
+	<entry key="deleteQnA">
+		UPDATE 
+			  QNA
+		  SET 
+		  	  STATUS = 'N'
+		WHERE 
+			  QNA_NO = ?
+	</entry>
+	<entry key="getAccountQnAListCountByAccountId">
+		SELECT
+			  COUNT(*)
+    	  FROM
+			  (SELECT
+                   	 ROWNUM RNUM
+                   , C.*
+    		   FROM
+        		   (SELECT
+						  Q.QNA_NO
+						, Q.ACCOUNT_ID
+						, Q.HOTEL_ID
+						, Q.QNA_TITLE
+						, Q.QNA_CONTENT
+						, Q.QNA_ANSWER
+						, Q.CREATE_DATE
+						, Q.STATUS
+						, Q.QNACOUNT
+						, Q.QNA_STATUS
+						, Q.MODIFY_DATE
+		  			 FROM 
+		       			  QNA Q
+		 			WHERE
+		       			  Q.STATUS = 'Y'
+               		  AND ACCOUNT_ID = ?
+	  			 ORDER BY
+	           		     Q.HOTEL_ID DESC)
+               C)
+	</entry>
+	<entry key="getAccountQnAListByAccountId">
+		SELECT
+              RNUM
+			, QNA_NO
+			, ACCOUNT_ID
+			, HOTEL_ID
+			, QNA_TITLE
+			, QNA_CONTENT
+			, QNA_ANSWER
+			, CREATE_DATE
+			, STATUS
+			, QNACOUNT
+			, QNA_STATUS
+			, MODIFY_DATE
+			, HOTEL_NAME
+			, NAME
+    	FROM
+			(SELECT
+                   ROWNUM RNUM
+                 , C.*
+    		   FROM
+        		   (SELECT
+						  A.QNA_NO
+						, A.ACCOUNT_ID
+						, A.HOTEL_ID
+						, A.QNA_TITLE
+						, A.QNA_CONTENT
+						, A.QNA_ANSWER
+						, A.CREATE_DATE
+						, A.STATUS
+						, A.QNACOUNT
+						, A.QNA_STATUS
+						, A.MODIFY_DATE
+						, H.HOTEL_NAME
+						, S.NAME
+		  			 FROM 
+		       			  QNA A
+		       			, HOTEL H
+		       			, ACCOUNT S
+		 			WHERE
+		       			  A.STATUS = 'Y'
+               		  AND A.HOTEL_ID = H.HOTEL_ID
+               		  AND A.ACCOUNT_ID = S.ACCOUNT_ID
+               	 	  AND A.ACCOUNT_ID = ?
+	  			 ORDER BY
+	           			 A.QNA_NO DESC)
+             C)
+    	WHERE
+             RNUM BETWEEN ? AND ?
+	</entry>
+</properties>

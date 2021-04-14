@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="selectList">
+	  SELECT
+            RESERVATION_NO
+           , R.ACCOUNT_ID
+           , ROOM_NO
+           , CHECK_IN
+           , CHECK_OUT
+           , REQUEST
+           , PAY_TYPE
+           , PAY_PRICE
+           , PAY_CODE
+           , PAY_STATUS
+           , R.STATUS
+           , R.ADULT_COUNT
+           , R.CHILD_COUNT
+           , GUEST_NAME
+           , GUEST_PHONE
+      FROM
+            RESERVATION R
+                JOIN ROOM USING (ROOM_NO)
+                JOIN HOTEL USING (HOTEL_ID)
+      WHERE
+            R.STATUS = 'Y'
+                AND HOTEL_ID = ?
+   ORDER BY
+            RESERVATION_NO DESC
+	</entry>
+	
+	<entry key="selectSearchReservationList">
+		SELECT
+				RESERVATION_NO
+			  , ACCOUNT_ID
+			  , ROOM_NO
+			  , CHECK_IN
+			  , CHECK_OUT
+			  , REQUEST
+			  , PAY_TYPE
+			  , PAY_PRICE
+			  , PAY_CODE
+			  , PAY_STATUS
+			  , STATUS
+			  , ADULT_COUNT
+			  , CHILD_COUNT
+			  , GUEST_NAME
+			  , GUEST_PHONE
+		FROM
+				RESERVATION
+		WHERE
+				STATUS = 'Y'
+			AND ACCOUNT_ID LIKE '%' || ? || '%'
+		ORDER BY
+				RESERVATION_NO DESC
+	</entry>
+	
+	<entry key="selectSearchRoomList">
+		SELECT
+				RESERVATION_NO
+			  , ACCOUNT_ID
+			  , ROOM_NO
+			  , CHECK_IN
+			  , CHECK_OUT
+			  , REQUEST
+			  , PAY_TYPE
+			  , PAY_PRICE
+			  , PAY_CODE
+			  , PAY_STATUS
+			  , STATUS
+			  , ADULT_COUNT
+			  , CHILD_COUNT
+			  , GUEST_NAME
+			  , GUEST_PHONE
+		FROM
+				RESERVATION
+		WHERE
+				STATUS = 'Y'
+			AND ROOM_NO LIKE '%' || ? || '%'
+		ORDER BY
+				RESERVATION_NO DESC
+	</entry>
+	
+	<entry key="selectDetailList">
+		SELECT
+            RESERVATION_NO
+           , ACCOUNT_ID
+           , ROOM_NO
+           , CHECK_IN
+           , CHECK_OUT
+           , REQUEST
+           , PAY_TYPE
+           , PAY_PRICE
+           , PAY_CODE
+           , PAY_STATUS
+           , STATUS
+           , ADULT_COUNT
+           , CHILD_COUNT
+           , GUEST_NAME
+           , GUEST_PHONE
+      FROM
+            RESERVATION
+      WHERE
+            STATUS = 'Y'
+        AND   RESERVATION_NO = ?
+   ORDER BY
+            RESERVATION_NO DESC
+	</entry>
+	<entry key="deleteReservation">
+		UPDATE 
+			   RESERVATION
+		   SET 
+		       STATUS = 'N'
+		 WHERE 
+		       RESERVATION_NO = ?
+	</entry>
+
+</properties>

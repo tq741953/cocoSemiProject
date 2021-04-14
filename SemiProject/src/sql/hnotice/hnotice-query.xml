@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="selectList">
+      SELECT
+               HNNO
+             , N.HOTEL_ID
+             , N.ACCOUNT_ID
+             , HNTITLE
+             , HNCONTENT
+             , CREATE_DATE
+             , MODIFY_DATE
+             , N.STATUS
+             , HOTEL_NAME
+       FROM
+             HOTEL_NOTICE N
+       JOIN 
+       	    HOTEL H ON (N.HOTEL_ID = H.HOTEL_ID)
+      WHERE
+            H.STATUS = 'Y'
+            AND N.STATUS = 'Y'
+        AND
+            H.HOTEL_ID = ?
+	ORDER BY
+    		   HNNO DESC
+	</entry>
+	
+	<entry key="selectSearchTitleList">
+		SELECT
+               HNNO
+             , N.HOTEL_ID
+             , N.ACCOUNT_ID
+             , HNTITLE
+             , HNCONTENT
+             , CREATE_DATE
+             , MODIFY_DATE
+             , N.STATUS
+             , HOTEL_NAME
+       FROM
+             HOTEL_NOTICE N
+       JOIN 
+       	    HOTEL H ON (N.HOTEL_ID = H.HOTEL_ID)
+		WHERE
+				H.STATUS = 'Y'
+                AND N.STATUS = 'Y'
+			AND HNTITLE LIKE '%' || ? || '%'
+            AND H.HOTEL_ID = ?
+		ORDER BY
+				HNNO DESC
+	</entry>
+	<entry key="selectSearchContentList">
+		SELECT
+               HNNO
+             , N.HOTEL_ID
+             , N.ACCOUNT_ID
+             , HNTITLE
+             , HNCONTENT
+             , CREATE_DATE
+             , MODIFY_DATE
+             , N.STATUS
+             , HOTEL_NAME
+       FROM
+             HOTEL_NOTICE N
+       JOIN 
+       	    HOTEL H ON (N.HOTEL_ID = H.HOTEL_ID)
+		WHERE
+				H.STATUS = 'Y'
+                AND N.STATUS = 'Y'
+			AND HNCONTENT LIKE '%' || ? || '%'
+            AND H.HOTEL_ID = ?
+		ORDER BY
+				HNNO DESC
+	</entry>
+	
+	<entry key="deleteNotice">
+		UPDATE
+				HOTEL_NOTICE
+			SET
+				STATUS = 'N'
+		  WHERE
+		  		HNNO = ?
+	</entry>
+	
+	<entry key="updateNotice">
+		UPDATE
+				HOTEL_NOTICE
+			SET
+				HNTITLE = ?
+			  , HNCONTENT = ?
+		  WHERE
+		  		HNNO = ?
+	</entry>
+		<entry key="insertNotice">
+		INSERT
+		INTO HOTEL_NOTICE
+		(
+			   HNNO
+   			 , HOTEL_ID
+   			 , ACCOUNT_ID
+   			 , HNTITLE
+   			 , HNCONTENT
+   			 , CREATE_DATE
+   			 , MODIFY_DATE
+  			 , STATUS
+		)
+		VALUES
+		(
+			HN_SEQ.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , SYSDATE
+		  , SYSDATE
+		  , DEFAULT
+		)
+	</entry>
+	
+	<entry key="selectdetailList">
+		SELECT
+               HNNO
+             , N.HOTEL_ID
+             , N.ACCOUNT_ID
+             , HNTITLE
+             , HNCONTENT
+             , CREATE_DATE
+             , MODIFY_DATE
+             , N.STATUS
+             , HOTEL_NAME
+       FROM
+             HOTEL_NOTICE N
+       JOIN 
+       	    HOTEL H ON (N.HOTEL_ID = H.HOTEL_ID)
+      WHERE
+            H.STATUS = 'Y'
+            AND N.STATUS = 'Y'
+        AND
+            HNNO = ?
+	 ORDER BY
+    		  HNNO DESC
+	</entry>
+	<entry key="updateNoticeForm">
+      SELECT
+               HNNO
+             , N.HOTEL_ID
+             , N.ACCOUNT_ID
+             , HNTITLE
+             , HNCONTENT
+             , CREATE_DATE
+             , MODIFY_DATE
+             , N.STATUS
+             , HOTEL_NAME
+       FROM
+             HOTEL_NOTICE N
+       JOIN 
+       	    HOTEL H ON (N.HOTEL_ID = H.HOTEL_ID)
+      WHERE
+            H.STATUS = 'Y'
+        AND
+            HNNO = ?      
+   </entry>
+</properties>

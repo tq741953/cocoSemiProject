@@ -1,0 +1,125 @@
+
+h1 {
+  font-size: 48px;
+  color : white;
+  font-weight: 100;
+}
+
+p {
+  color : white;
+}
+
+/* main_text0 */
+
+.main_text0{
+  width: 1000px;
+  min-height:300px;
+  margin : auto;
+
+  background: white;
+}
+
+
+/* main_text0 */
+
+caption {
+  display: none;
+}
+
+.faqlistwrap {
+  margin : auto;
+  width: 1000px;
+  padding-top: 20px;
+  
+}
+
+.faqlist > tr > td > a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.faqlistwrap th{
+	height : 44px;
+	color:#B3B3B3; 
+	background-color : #343A40;
+}
+
+.faqlistwrap th:nth-child(3){
+	width : 100px;
+}
+
+.faqlistwrap th:nth-child(4){
+	width : 150px;
+}
+
+.faqlistwrap th:nth-child(5){
+	width : 150px;
+}
+
+
+.faqlistwrap td {
+  background-color : white;
+  font-size: 18px;
+  padding: 10px;
+}
+
+table {
+  border-collapse: collapse;
+  margin: auto;
+  text-align: center;
+    
+}
+
+.faqlistwrap td {
+  text-align: center;
+}
+
+.faqlistwrap tbody tr td:nth-child(2) {
+  text-align: left;
+}
+
+.faqlist tr {
+  border: 1px solid #999;
+  
+}
+
+thead {
+  background-color:gainsboro;
+}
+
+.faqlistwrap tbody tr td:nth-child(2):hover {
+  text-decoration: underline;
+  background-color: gainsboro;
+}
+
+
+
+.faqlistwrap tr th:nth-child(2) {
+  width: 500px;
+  color:#B3B3B3; 
+  background-color : #343A40;
+}
+
+.searchwrap {
+  width : 510px;
+  height : 55px;
+  margin : auto;
+  margin-top: 30px;
+  
+}
+
+.searcharea2 {
+  border: 2px solid white;
+  width: 500px;
+  padding: 10px;
+  background-color: #343A40;
+}
+
+.paging{
+	margin-top : 20px;
+}
+
+.btn {
+	margin : 2px;
+}

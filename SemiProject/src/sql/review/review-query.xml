@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="selectList">
+		SELECT
+				REVIEW_NO
+			  , R.ACCOUNT_ID
+			  , RESERVATION_NO
+			  , REVIEW_TITLE
+			  , REVIEW_CONTENT
+			  , REVIEW_GRADE
+			  , CREATE_DATE
+			  , MODIFY_DATE
+			  , R.STATUS
+			  , NAME
+		FROM
+				REVIEW R
+		JOIN RESERVATION USING(RESERVATION_NO)
+        JOIN ROOM USING(ROOM_NO)
+        JOIN ACCOUNT A ON(A.ACCOUNT_ID = R.ACCOUNT_ID)
+		WHERE
+				R.STATUS = 'Y'
+		  AND HOTEL_ID = ?
+	ORDER BY
+				REVIEW_NO DESC
+	</entry>
+		
+	<entry key="selectSearchTitleList">
+		SELECT
+				REVIEW_NO
+			  , ACCOUNT_ID
+			  , RESERVATION_NO
+			  , REVIEW_TITLE
+			  , REVIEW_CONTENT
+			  , REVIEW_GRADE
+			  , CREATE_DATE
+			  , MODIFY_DATE
+			  , STATUS
+		FROM
+				REVIEW
+		WHERE
+				STATUS = 'Y'
+			AND RESERVATION_NO LIKE '%' || ? || '%'
+		ORDER BY
+				REVIEW_NO DESC
+	</entry>
+	
+	<entry key="selectSearchContentList">
+		SELECT
+				REVIEW_NO
+			  , ACCOUNT_ID
+			  , RESERVATION_NO
+			  , REVIEW_TITLE
+			  , REVIEW_CONTENT
+			  , REVIEW_GRADE
+			  , CREATE_DATE
+			  , MODIFY_DATE
+			  , STATUS
+		FROM
+				REVIEW
+		WHERE
+				STATUS = 'Y'
+			AND REVIEW_CONTENT LIKE '%' || ? || '%'
+		ORDER BY
+				REVIEW_NO DESC
+	</entry>
+	
+	<entry key="selectDetailList">
+          SELECT
+				REVIEW_NO
+			  , R.ACCOUNT_ID
+			  , RESERVATION_NO
+			  , REVIEW_TITLE
+			  , REVIEW_CONTENT
+			  , REVIEW_GRADE
+			  , CREATE_DATE
+			  , MODIFY_DATE
+			  , R.STATUS
+              , NAME
+		FROM
+				REVIEW R
+		JOIN RESERVATION USING(RESERVATION_NO)
+        JOIN ROOM USING(ROOM_NO)
+        JOIN ACCOUNT A ON(A.ACCOUNT_ID = R.ACCOUNT_ID)
+		WHERE
+				STATUS = 'Y'
+                AND REVIEW_NO = ?
+		ORDER BY
+				REVIEW_NO DESC
+	</entry>
+		<entry key="reviewInsertForm">
+		SELECT
+	        R.RESERVATION_NO,
+	        H.HOTEL_NAME,
+	        ROOM_NO,
+	        R.GUEST_NAME,
+	        R.CHECK_IN,
+	        R.CHECK_OUT,
+	        R.ADULT_COUNT,
+	        R.CHILD_COUNT,
+	        R.STATUS,
+	        R.ACCOUNT_ID
+		FROM 
+		        RESERVATION R
+		JOIN 
+		        ROOM M USING(ROOM_NO)
+		LEFT JOIN 
+		        HOTEL H ON(H.HOTEL_ID = M.HOTEL_ID)
+		WHERE 
+		      R.STATUS = 'Y'
+		AND   R.RESERVATION_NO = ?
+		
+	</entry>
+	<entry key="reviewInsert">
+	INSERT
+				INTO REVIEW
+			(
+              REVIEW_NO
+           	  , ACCOUNT_ID
+              , RESERVATION_NO
+              , REVIEW_TITLE
+              , REVIEW_CONTENT
+              , REVIEW_GRADE
+              , CREATE_DATE
+              , MODIFY_DATE
+              , STATUS
+              
+		)
+		VALUES
+		(
+			REVIEW_SEQ.NEXTVAL
+          , ?
+          , ?
+          , ?
+          , ?
+          , ?
+		  , SYSDATE
+		  , SYSDATE
+		  , 'Y'
+		)
+	</entry>
+	<entry key="selectList1">
+        SELECT
+				V.REVIEW_NO
+			  , V.ACCOUNT_ID
+			  , RESERVATION_NO
+              , HOTEL_NAME
+			  , V.REVIEW_TITLE
+			  , V.REVIEW_CONTENT
+			  , V.REVIEW_GRADE
+			  , V.CREATE_DATE
+			  , V.MODIFY_DATE
+			  , V.STATUS
+		FROM
+				REVIEW V
+        JOIN   
+                RESERVATION R USING(RESERVATION_NO)
+        JOIN   
+                ROOM M ON(R.ROOM_NO = M.ROOM_NO)
+        JOIN
+                HOTEL H ON(H.HOTEL_ID = M.HOTEL_ID)
+        WHERE
+				V.ACCOUNT_ID = ?	
+		 AND    V.STATUS = 'Y'
+	ORDER BY
+				V.REVIEW_NO DESC
+	</entry>
+	<!-- 예약한거 가져오기 외부조인-->
+	<entry key="rCheckList">
+			SELECT
+		        R.RESERVATION_NO,
+		        H.HOTEL_NAME,
+		        ROOM_NO,
+		        R.GUEST_NAME,
+		        R.CHECK_IN,
+		        R.CHECK_OUT,
+		        R.ADULT_COUNT,
+		        R.CHILD_COUNT,
+		        R.STATUS,
+		        R.ACCOUNT_ID
+                
+		FROM 
+        		RESERVATION R
+		JOIN 
+        		ROOM M USING(ROOM_NO)
+       
+		LEFT JOIN 
+        		HOTEL H ON(H.HOTEL_ID = M.HOTEL_ID)
+		WHERE 
+        		
+          		R.ACCOUNT_ID = ?
+        ORDER BY
+        		RESERVATION_NO DESC	
+	</entry>
+	<entry key="reviewDetail">
+        SELECT
+				V.REVIEW_NO
+			  , V.ACCOUNT_ID
+			  , RESERVATION_NO
+              , HOTEL_NAME
+			  , V.REVIEW_TITLE
+			  , V.REVIEW_CONTENT
+			  , V.REVIEW_GRADE
+			  , V.CREATE_DATE
+			  , V.MODIFY_DATE
+			  , V.STATUS
+		FROM
+				REVIEW V
+        JOIN   
+                RESERVATION R USING(RESERVATION_NO)
+        JOIN   
+                ROOM M ON(R.ROOM_NO = M.ROOM_NO)
+        JOIN
+                HOTEL H ON(H.HOTEL_ID = M.HOTEL_ID)
+        WHERE
+				V.REVIEW_NO = ?	
+		 AND    V.STATUS = 'Y'
+	ORDER BY
+				V.REVIEW_NO DESC	
+	
+	</entry>
+	<entry key="reviewUpdate">
+	    UPDATE 
+			   REVIEW
+		   SET 
+		       REVIEW_TITLE = ?
+		     , REVIEW_CONTENT = ?
+             , REVIEW_GRADE = ?
+             , MODIFY_DATE = SYSDATE
+		 WHERE 
+		       REVIEW_NO = ?
+	
+	</entry>
+	<entry key="reviewDelete">
+	    UPDATE 
+			   REVIEW
+		   SET 
+		       STATUS = 'N'
+		 WHERE 
+		       REVIEW_NO = ?
+	</entry>
+	<entry key="reviewChecked">
+		
+		 SELECT
+		 		 COUNT(*)
+		 FROM 
+		 		 REVIEW 
+		 WHERE
+		 		 RESERVATION_NO = ?
+	
+	</entry>
+	
+</properties>
